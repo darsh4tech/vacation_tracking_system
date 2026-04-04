@@ -22,3 +22,9 @@ expert in company policy or the local facility’s leave policies.
 ## 4. Constraints
 *   **Technical:** [e.g., Must run on Python 3.9]
 *   **Budget/Time:** [e.g., Completed by Q3]
+
+# Actors
+## Employee
+## Manager
+## Clerk
+## System Admin
