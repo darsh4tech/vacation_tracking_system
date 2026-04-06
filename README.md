@@ -12,16 +12,26 @@ expert in company policy or the local facility’s leave policies.
 *   **Goal:** give individual employees the capability and responsibility to manage this particular aspect of their employment agreements with the company
 
 ## 2. Functional Requirements
-*   **FR-01:** [Feature A]
-*   **FR-02:** [Feature B]
+*   **Rules-Based Validation**
+*   **Request Management 1 year before and up to 1.5 years after**
+*   **Automated Email Notifications**
+*   **Managerial Control for approving and awarding leave time within system-set limits**
+*   **HR and system administration Overrides actions restricted by rules, provided these overrides are logged**
+*   **Authentication utilizing existing Portal single-sign-on**
+*   **Integration to retrieve employee data or expose employee vacation request summaries**
+*   **Activity Logging**
 
 ## 3. Non-Functional Requirements
-*   **Performance:** [e.g., System must load in < 2 seconds]
-*   **Security:** [e.g., Data must be encrypted]
+*   **Ease of Use**
+*   **use same existing hardware and middleware**
+*   **Scalability**
 
 ## 4. Constraints
-*   **Technical:** [e.g., Must run on Python 3.9]
-*   **Budget/Time:** [e.g., Completed by Q3]
+*   **Existing Infrastructure:**
+*   **single-sign-on (SSO)**
+*   **Legacy Integration**
+*   **follow Business and company Policies** [eg employees work eight-hour days, validation rules for VTS defined and owned by the HR]
+*   **Logging Requirements**
 
 # Actors
 ## Employee
