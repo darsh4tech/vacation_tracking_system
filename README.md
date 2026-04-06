@@ -1,8 +1,10 @@
 # Vacation Tracking System
 
 # **Domain** 
-managers have fewer informal interactions with their workers and find it
-increasingly difficult to be aware of and manage their workers’ vacation time
+management of employee leave time—specifically vacation time, sick leave, and personal time off—within a corporate business environment such that:
+* Streamlining HR
+* Managerial Oversight
+* Employee Empowerment
 
 # System Requirements Documentation
 
