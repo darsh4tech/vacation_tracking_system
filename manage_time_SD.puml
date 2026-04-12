@@ -1,0 +1,72 @@
+@startuml  
+actor Employee  
+actor Manager  
+participant "VTS System" as VTS  
+database DB  
+participant "Email Service" as Email  
+
+
+Employee -> VTS : Open VTS via portal 
+VTS -> VTS : Validate authentication 
+
+opt Authentication failed 
+    VTS --> Employee : Show authentication error 
+end
+
+VTS -> DB : Fetch vacation balance & requests  
+DB --> VTS : Return data  
+VTS --> Employee : Display dashboard  
+
+== Employee submits request ==  
+
+Employee -> VTS : Create new request  
+VTS --> Employee : Show form (calendar, inputs)  
+
+Employee -> VTS : Submit request details  
+VTS -> VTS : Validate data  
+
+alt Invalid data  
+    VTS --> Employee : Show errors  
+    Employee -> VTS : Edit / Cancel  
+else Valid data  
+    VTS -> DB : Save request (Pending)  
+    
+    opt [Requires approval]  
+        VTS -> Email : Send approval email  
+        Email -> Manager : Notify manager  
+    end  
+    
+    VTS --> Employee : Redirect to homepage  
+end  
+
+== Manager approval process ==   
+
+Manager -> VTS : Open request (via link/login)
+
+opt Authentication failed 
+    VTS --> Employee : Show authentication error 
+end
+
+Manager -> VTS : Fetch manager dashboard data  
+VTS -> DB : Fetch manager dashboard data  
+DB --> VTS : Return balances + pending requests  
+VTS --> Manager : Display home page (incl. pending requests)  
+
+loop For each pending request
+    Manager -> VTS : Select request  
+    VTS --> Manager : Display request details  
+
+    Manager -> VTS : Approve / Reject  
+
+    opt Rejected Request  
+        VTS --> Manager : Prompt for reason  
+        Manager -> VTS : Submit reason  
+    end  
+
+    VTS -> DB : Update request status  
+    VTS -> Email : Notify employee  
+    Email -> Employee : Send result  
+
+    VTS --> Manager : Return to home page 
+end
+@enduml
