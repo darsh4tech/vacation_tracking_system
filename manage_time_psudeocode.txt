@@ -1,0 +1,106 @@
+BEGIN
+
+ =====================
+ EMPLOYEE AUTHENTICATION
+ =====================
+DISPLAY Open VTS Portal
+
+IF NOT authenticateEmployee() THEN
+    DISPLAY Authentication Failed
+    END
+END IF
+
+
+ =====================
+ LOAD DASHBOARD
+ =====================
+employeeData = fetchEmployeeData()
+DISPLAY employeeData
+
+
+ =====================
+ CREATE VACATION REQUEST
+ =====================
+WHILE employeeWantsToCreateRequest = TRUE
+
+    DISPLAY Create New Request Form
+    
+    request = getRequestDetails()    dates, hours, title, description
+    
+     =====================
+     VALIDATION
+     =====================
+    IF NOT validateRequest(request) THEN
+        DISPLAY Errors in request
+        CONTINUE    go back to form
+    END IF
+
+     =====================
+     SAVE REQUEST
+     =====================
+    saveRequest(request, status=Pending)
+
+     =====================
+     OPTIONAL APPROVAL
+     =====================
+    IF requiresApproval(request) THEN
+        sendEmailToManager(request)
+    END IF
+
+    DISPLAY Request submitted successfully
+
+    BREAK    exit loop after submission
+
+END WHILE
+
+
+ =====================
+ MANAGER PROCESS
+ =====================
+IF managerAccessesSystem() THEN
+
+     =====================
+     MANAGER AUTHENTICATION (OPTIONAL)
+     =====================
+    IF managerNeedsAuthentication() THEN
+        IF NOT authenticateManager() THEN
+            DISPLAY Manager Authentication Failed
+            END
+        END IF
+    END IF
+
+     =====================
+     LOAD MANAGER DASHBOARD
+     =====================
+    managerData = fetchManagerDashboard()
+    DISPLAY managerData
+
+     =====================
+     PROCESS REQUESTS LOOP
+     =====================
+    FOR EACH request IN pendingRequests
+
+        DISPLAY requestDetails(request)
+
+        decision = getManagerDecision()    Approve or Reject
+
+        IF decision == Reject THEN
+            reason = getRejectionReason()
+            updateRequestStatus(request, Rejected, reason)
+        ELSE
+            updateRequestStatus(request, Approved)
+        END IF
+
+         =====================
+         NOTIFICATION
+         =====================
+        notifyEmployee(request)
+
+    END FOR
+
+END IF
+
+
+ =====================
+END
+ =====================

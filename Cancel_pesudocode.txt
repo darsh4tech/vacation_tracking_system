@@ -1,0 +1,98 @@
+FUNCTION cancelApprovedRequest(employeeId, requestId):
+
+    // =========================
+    // AUTHENTICATION
+    // =========================
+    IF NOT isEmployeeAuthenticated(employeeId) THEN
+        RETURN Error("Authentication failed")
+    END IF
+
+
+    // =========================
+    // FETCH REQUEST
+    // =========================
+    request = getRequestById(requestId)
+
+    IF request IS NULL THEN
+        RETURN Error("Request not found")
+    END IF
+
+    IF request.employeeId != employeeId THEN
+        RETURN Error("Unauthorized access")
+    END IF
+
+    IF request.status != "APPROVED" THEN
+        RETURN Error("Only approved requests can be cancelled")
+    END IF
+
+
+    // =========================
+    // VALIDATE TIME WINDOW
+    // =========================
+    currentDate = getCurrentDate()
+
+    IF request.date < currentDate - 5_business_days THEN
+        RETURN Error("Request is خارج allowed cancellation window")
+    END IF
+
+
+    // =========================
+    // DETERMINE TYPE
+    // =========================
+    IF request.date >= currentDate THEN
+        requestType = "FUTURE"
+    ELSE
+        requestType = "RECENT_PAST"
+    END IF
+
+
+    // =========================
+    // USER CONFIRMATION
+    // =========================
+    confirmation = getUserConfirmation()
+
+    IF confirmation == FALSE THEN
+        RETURN Success("Cancellation aborted")
+    END IF
+
+
+    // =========================
+    // HANDLE RECENT PAST CASE
+    // =========================
+    IF requestType == "RECENT_PAST" THEN
+        explanation = getUserInput("Enter cancellation reason")
+
+        IF explanation IS EMPTY THEN
+            RETURN Error("Explanation is required for past cancellations")
+        END IF
+    END IF
+
+
+    // =========================
+    // UPDATE REQUEST
+    // =========================
+    request.status = "CANCELLED"
+    request.cancelReason = explanation (if exists)
+
+    updateRequest(request)
+
+
+    // =========================
+    // RESTORE BALANCE
+    // =========================
+    restoreVacationBalance(employeeId, request)
+
+
+    // =========================
+    // NOTIFY MANAGER
+    // =========================
+    managerId = getManager(employeeId)
+    sendEmail(managerId, "Request cancelled", request)
+
+
+    // =========================
+    // RETURN RESULT
+    // =========================
+    RETURN Success("Request cancelled successfully")
+
+END FUNCTION

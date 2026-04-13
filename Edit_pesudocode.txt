@@ -1,0 +1,81 @@
+FUNCTION editPendingRequest(employeeId, requestId):
+
+    // =========================
+    // AUTHENTICATION
+    // =========================
+    IF NOT isEmployeeAuthenticated(employeeId) THEN
+        RETURN Error("Authentication failed")
+    END IF
+
+
+    // =========================
+    // FETCH REQUEST
+    // =========================
+    request = getRequestById(requestId)
+
+    IF request IS NULL THEN
+        RETURN Error("Request not found")
+    END IF
+
+    IF request.employeeId != employeeId THEN
+        RETURN Error("Unauthorized access")
+    END IF
+
+    IF request.status != "PENDING" THEN
+        RETURN Error("Only pending requests can be edited")
+    END IF
+
+
+    // =========================
+    // USER ACTION SELECTION
+    // =========================
+    action = getUserAction()   // EDIT or WITHDRAW
+
+
+    // =========================
+    // WITHDRAW REQUEST
+    // =========================
+    IF action == "WITHDRAW" THEN
+
+        confirmation = getUserConfirmation()
+
+        IF confirmation == FALSE THEN
+            RETURN Success("Withdrawal cancelled")
+        END IF
+
+        request.status = "WITHDRAWN"
+        updateRequest(request)
+
+        RETURN Success("Request withdrawn successfully")
+
+    END IF
+
+
+    // =========================
+    // EDIT REQUEST LOOP
+    // =========================
+    WHILE TRUE
+
+        updatedData = getUpdatedRequestData()
+
+        validationResult = validateRequestData(updatedData)
+
+        IF validationResult.isValid == FALSE THEN
+            DISPLAY validationResult.errors
+            CONTINUE   // retry editing
+        END IF
+
+        // =========================
+        // APPLY CHANGES
+        // =========================
+        request.title = updatedData.title
+        request.description = updatedData.description
+        request.dates = updatedData.dates
+
+        updateRequest(request)
+
+        RETURN Success("Request updated successfully")
+
+    END WHILE
+
+END FUNCTION
