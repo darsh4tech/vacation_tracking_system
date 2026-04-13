@@ -1,0 +1,62 @@
+@startuml
+!theme aws-orange
+actor Employee
+participant "VTS System" as VTS
+database DB
+participant "Email Service" as Email
+actor Manager
+
+== Access VTS ==
+
+Employee -> VTS : Open VTS via portal
+
+alt Authentication failed
+    VTS --> Employee : Show authentication error
+else Authenticated
+    VTS -> DB : Fetch requests & balances
+    DB --> VTS : Return data
+    VTS --> Employee : Display dashboard
+end
+
+
+== Select Request ==
+
+Employee -> VTS : Select approved request to cancel
+VTS --> Employee : Display request details
+
+
+== Cancel Request ==
+
+alt Request in future
+    VTS --> Employee : Ask for cancellation confirmation
+
+    alt Employee confirms
+        VTS -> DB : Update request (Canceled)
+        VTS -> DB : Restore vacation balance
+        VTS -> Email : Notify manager
+        Email -> Manager : Send cancellation email
+    else Employee aborts
+        VTS --> Employee : No changes made
+    end
+
+else Request in recent past (max 5 days)
+    VTS --> Employee : Ask for confirmation + explanation
+
+    alt Employee confirms with explanation
+        Employee -> VTS : Submit explanation
+        VTS -> DB : Update request (Canceled)
+        VTS -> DB : Restore vacation balance
+        VTS -> Email : Notify manager
+        Email -> Manager : Send cancellation email
+    else Employee aborts
+        VTS --> Employee : No changes made
+    end
+end
+
+
+== Return to Home ==
+
+VTS -> DB : Refresh requests & balances
+DB --> VTS : Updated data
+VTS --> Employee : Display updated dashboard
+@enduml

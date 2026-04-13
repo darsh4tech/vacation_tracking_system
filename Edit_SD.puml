@@ -1,0 +1,55 @@
+@startuml
+actor Employee
+participant "VTS System" as VTS
+database DB
+
+== Access VTS ==
+
+Employee -> VTS : Open VTS via portal
+
+alt Authentication failed
+    VTS --> Employee : Show authentication error
+else Authenticated
+    VTS -> DB : Fetch requests & balances
+    DB --> VTS : Return data
+    VTS --> Employee : Display dashboard
+end
+
+
+== Select Request ==
+
+Employee -> VTS : Select pending request
+VTS --> Employee : Display editable form
+
+
+== Modify Request ==
+
+alt [Employee withdraws request]
+    
+    VTS --> Employee : Confirm withdrawal
+    
+    alt [Confirmed]
+        VTS -> DB : Delete/Withdraw request
+        VTS --> Employee : Return to home page
+    else [Cancelled]
+        VTS --> Employee : No changes made
+    end
+
+else [Employee edits request]
+    
+    loop Until valid input or cancel
+        Employee -> VTS : Submit updated data
+        VTS -> VTS : Validate changes
+
+        opt [Error]
+            VTS --> Employee : Show errors (highlight issues)
+        end
+
+        VTS -> DB : Update request
+        VTS --> Employee : Return to home page
+        break
+    end
+
+end
+
+@enduml
