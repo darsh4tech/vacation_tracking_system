@@ -1,0 +1,38 @@
+@startuml
+[*] --> PENDING : create request
+
+' =========================
+' EDIT / WITHDRAW (while pending)
+' =========================
+PENDING --> PENDING : edit request
+PENDING --> WITHDRAWN : withdraw request
+
+' =========================
+' MANAGER APPROVAL
+' =========================
+PENDING --> APPROVED : manager approves
+PENDING --> REJECTED : manager rejects
+
+' =========================
+' CANCEL APPROVED REQUEST
+' =========================
+APPROVED --> CANCELLED : employee cancels (future/past rules)
+
+' =========================
+' HR WORKFLOW (EXTENSIBLE)
+' =========================
+APPROVED --> HR_PENDING : move to HR review
+
+HR_PENDING --> HR_APPROVED : HR approves
+HR_PENDING --> HR_REJECTED : HR rejects
+
+' =========================
+' FINAL STATES
+' =========================
+REJECTED --> [*]
+WITHDRAWN --> [*]
+CANCELLED --> [*]
+HR_APPROVED --> [*]
+HR_REJECTED --> [*]
+
+@enduml
